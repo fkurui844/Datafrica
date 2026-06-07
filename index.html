@@ -830,6 +830,43 @@
       letter-spacing: 0.06em; padding-top: 4px; border-top: 1px solid rgba(6,182,212,0.12);
     }
 
+    /* StayDesk card accent colours */
+    .sd-mockup .mock-hero.sd { border-top: 2px solid rgba(16,185,129,0.4); }
+    .mock-stat.sd-stat { background: rgba(16,185,129,0.08); color: rgba(16,185,129,0.85); }
+    .mock-kpi.sd-kpi { background: rgba(16,185,129,0.07); }
+    .kpi-val.sd-val { color: #10b981; }
+    .sd-footer-badge {
+      text-align: center; font-size: 0.65rem; color: rgba(16,185,129,0.5);
+      letter-spacing: 0.06em; padding-top: 4px; border-top: 1px solid rgba(16,185,129,0.12);
+    }
+    .mock-rooms {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; padding: 6px 10px;
+    }
+    .mock-room {
+      border-radius: 5px; padding: 5px 4px; font-size: 0.58rem; text-align: center;
+      font-weight: 600; letter-spacing: 0.03em;
+    }
+    .mock-room.avail { background: rgba(16,185,129,0.15); color: #10b981; }
+    .mock-room.occ   { background: rgba(245,158,11,0.15);  color: #f59e0b; }
+    .mock-room.maint { background: rgba(148,163,184,0.12); color: #94a3b8; }
+
+    /* Ebola Tracker card accent colours */
+    .eb-mockup .mock-hero.eb { border-top: 2px solid rgba(239,68,68,0.45); }
+    .mock-stat.eb-stat { background: rgba(239,68,68,0.08); color: rgba(239,68,68,0.85); }
+    .mock-kpi.eb-kpi { background: rgba(239,68,68,0.07); }
+    .kpi-val.eb-val { color: #ef4444; }
+    .eb-footer-badge {
+      text-align: center; font-size: 0.65rem; color: rgba(239,68,68,0.5);
+      letter-spacing: 0.06em; padding-top: 4px; border-top: 1px solid rgba(239,68,68,0.15);
+    }
+    .mock-pheic {
+      margin: 4px 10px 0; padding: 5px 10px; border-radius: 6px;
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25);
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.62rem; font-weight: 700; color: #ef4444; letter-spacing: 0.05em;
+    }
+    .mock-pheic-dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: pulse 1.4s infinite; }
+
     /* ══ CAREERS ══ */
     .careers { padding: 110px 0; background: var(--bg3); }
 
@@ -2004,6 +2041,120 @@
             </div>
             <div class="live-actions">
               <a href="https://www.matatuhub.co.ke/" target="_blank" rel="noopener" class="btn btn-primary">
+                View Live <i class="fas fa-external-link-alt"></i>
+              </a>
+              <a href="#contact" class="btn btn-outline">Build Something Similar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- StayDesk -->
+      <div class="live-card reveal reveal-delay-1">
+        <div class="live-card-inner reverse">
+          <div class="live-card-preview">
+            <div class="browser-bar">
+              <span class="browser-dot"></span><span class="browser-dot"></span><span class="browser-dot"></span>
+              <span class="browser-url">fkurui844.github.io/Guest-House-Managment-System</span>
+            </div>
+            <div class="live-card-mockup sd-mockup">
+              <div class="mock-hero sd">
+                <div class="mock-icon">🏨</div>
+                <div class="mock-title">StayDesk</div>
+                <div class="mock-sub">Guest House Management for Africa</div>
+              </div>
+              <div class="mock-stats">
+                <div class="mock-stat sd-stat"><span>🛏️</span> Room Mgmt</div>
+                <div class="mock-stat sd-stat"><span>📅</span> Bookings</div>
+                <div class="mock-stat sd-stat"><span>📱</span> M-Pesa Pay</div>
+                <div class="mock-stat sd-stat"><span>👥</span> Staff Roles</div>
+              </div>
+              <div class="mock-rooms">
+                <div class="mock-room avail">101 ✓ Free</div>
+                <div class="mock-room occ">102 🔑 Occ</div>
+                <div class="mock-room avail">103 ✓ Free</div>
+                <div class="mock-room occ">201 🔑 Occ</div>
+                <div class="mock-room maint">202 🔧 Maint</div>
+                <div class="mock-room avail">203 ✓ Free</div>
+              </div>
+              <div class="mock-kpis">
+                <div class="mock-kpi sd-kpi"><div class="kpi-val sd-val">21</div><div class="kpi-lbl">Businesses</div></div>
+                <div class="mock-kpi sd-kpi"><div class="kpi-val sd-val">1,340+</div><div class="kpi-lbl">Bookings</div></div>
+                <div class="mock-kpi sd-kpi"><div class="kpi-val sd-val">4.2M</div><div class="kpi-lbl">KES Tracked</div></div>
+              </div>
+              <div class="sd-footer-badge">Developed by DatAfrica · Firebase · Multi-Tenant · 2025</div>
+            </div>
+          </div>
+          <div class="live-card-info">
+            <div class="live-badge">🟢 Live &amp; Deployed</div>
+            <div class="live-cat">Hospitality Tech · Property Management · Cloud SaaS</div>
+            <h3 class="live-title">StayDesk — Guest House Management System</h3>
+            <p class="live-desc">A cloud-based, multi-tenant property management platform built specifically for African guesthouses. From room availability and advance bookings to M-Pesa payment tracking, occupancy dashboards, and role-based staff access — StayDesk gives hospitality owners across Kenya and beyond a fully digital operation in under an hour. Already trusted by 21 businesses with 1,340+ bookings processed.</p>
+            <div class="live-tags">
+              <span class="live-tag">Room Management</span>
+              <span class="live-tag">Booking Engine</span>
+              <span class="live-tag">M-Pesa Payments</span>
+              <span class="live-tag">Revenue Dashboard</span>
+              <span class="live-tag">Staff &amp; Roles</span>
+              <span class="live-tag">Firebase · Cloud Sync</span>
+            </div>
+            <div class="live-actions">
+              <a href="https://fkurui844.github.io/Guest-House-Managment-System/" target="_blank" rel="noopener" class="btn btn-primary">
+                View Live <i class="fas fa-external-link-alt"></i>
+              </a>
+              <a href="#contact" class="btn btn-outline">Build Something Similar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ebola Outbreak Tracker -->
+      <div class="live-card reveal reveal-delay-2">
+        <div class="live-card-inner">
+          <div class="live-card-preview">
+            <div class="browser-bar">
+              <span class="browser-dot"></span><span class="browser-dot"></span><span class="browser-dot"></span>
+              <span class="browser-url">ebola-tracker-nine.vercel.app</span>
+            </div>
+            <div class="live-card-mockup eb-mockup">
+              <div class="mock-hero eb">
+                <div class="mock-icon">🦠</div>
+                <div class="mock-title">Ebola Tracker 2026</div>
+                <div class="mock-sub">BDBV · Global Surveillance · Live</div>
+              </div>
+              <div class="mock-pheic">
+                <div class="mock-pheic-dot"></div>
+                WHO PHEIC DECLARED — 17 MAY 2026
+              </div>
+              <div class="mock-stats">
+                <div class="mock-stat eb-stat"><span>📡</span> Live WHO Data</div>
+                <div class="mock-stat eb-stat"><span>🗺️</span> Leaflet Map</div>
+                <div class="mock-stat eb-stat"><span>📊</span> CFR Trends</div>
+                <div class="mock-stat eb-stat"><span>🏥</span> ETC Tracker</div>
+              </div>
+              <div class="mock-kpis">
+                <div class="mock-kpi eb-kpi"><div class="kpi-val eb-val">134</div><div class="kpi-lbl">Confirmed</div></div>
+                <div class="mock-kpi eb-kpi"><div class="kpi-val eb-val">13.4%</div><div class="kpi-lbl">CFR</div></div>
+                <div class="mock-kpi eb-kpi"><div class="kpi-val eb-val">8+</div><div class="kpi-lbl">Countries</div></div>
+              </div>
+              <div class="eb-footer-badge">WHO · ECDC · CDC · Africa CDC — Auto-refresh · 2026</div>
+            </div>
+          </div>
+          <div class="live-card-info">
+            <div class="live-badge">🟢 Live &amp; Deployed</div>
+            <div class="live-cat">Public Health · Global Surveillance · Real-Time Intelligence</div>
+            <h3 class="live-title">Ebola Outbreak Tracker 2026 — Live</h3>
+            <p class="live-desc">A real-time public health intelligence dashboard tracking the 2026 Bundibugyo Ebola (BDBV) outbreak across DRC, Uganda, and 8+ countries under surveillance. Built on live WHO, ECDC, CDC, and Africa CDC data feeds, it features an interactive Leaflet.js risk map with treatment centre markers and border screening indicators, CFR trend analysis, historical outbreak comparisons, and auto-refreshing case counts — deployed as a single-file progressive web app.</p>
+            <div class="live-tags">
+              <span class="live-tag">WHO / ECDC / CDC Data</span>
+              <span class="live-tag">Interactive Risk Map</span>
+              <span class="live-tag">Live Case Counts</span>
+              <span class="live-tag">CFR Analytics</span>
+              <span class="live-tag">ETC Locations</span>
+              <span class="live-tag">Border Screening</span>
+            </div>
+            <div class="live-actions">
+              <a href="https://ebola-tracker-nine.vercel.app/" target="_blank" rel="noopener" class="btn btn-primary">
                 View Live <i class="fas fa-external-link-alt"></i>
               </a>
               <a href="#contact" class="btn btn-outline">Build Something Similar</a>
