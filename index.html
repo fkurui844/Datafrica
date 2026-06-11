@@ -1423,70 +1423,169 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
   }
 
   /* ════════════════════════════════════════════════════════════
-   * ██████╗  █████╗ ████████╗ █████╗ ███████╗██████╗ ██╗ ██████╗ █████╗
-   * DatAfrica — VACANCIES MANAGER
+   * DatAfrica — DYNAMIC VACANCIES (Google Sheets powered)
    * ════════════════════════════════════════════════════════════
    *
-   * HOW TO ADD A VACANCY
-   * ─────────────────────
-   * 1. Copy one of the example objects below (between the { })
-   * 2. Paste it inside the VACANCIES array (add a comma after the previous entry)
-   * 3. Fill in the fields — all fields are required except "deadline"
-   * 4. Save the file — the job card will appear automatically
+   * HOW TO MANAGE VACANCIES — no code needed, ever:
+   * ─────────────────────────────────────────────────
+   * 1. Open your Google Sheet (link in SHEET_CSV_URL below)
+   * 2. Add or edit a row — one vacancy per row
+   * 3. Save — the site updates automatically on next load
    *
-   * HOW TO REMOVE A VACANCY
-   * ────────────────────────
-   * Delete the entire { ... } object for that role (including its trailing comma)
-   * Save the file — the card disappears immediately
+   * SHEET COLUMNS (exact order, Row 1 = headers):
+   *   A: title      → e.g. "Data Analyst"
+   *   B: dept       → e.g. "Analytics"
+   *   C: type       → e.g. "Full-time" | "Contract" | "Commission-Based"
+   *   D: location   → e.g. "Nairobi" | "Remote"
+   *   E: desc       → Role description (one or two sentences)
+   *   F: skills     → Comma-separated  e.g. "Python, SQL, Power BI"
+   *   G: deadline   → e.g. "31 Dec 2025"  (leave blank to hide)
+   *   H: status     → "open" to show | anything else to hide
    *
-   * FIELD GUIDE
-   * ───────────
-   *  title      → Job title shown as the card heading
-   *  dept       → Department / team label (e.g. "Data Analytics", "Engineering")
-   *  type       → Employment type badge  e.g. "Full-time" | "Part-time" | "Contract" | "Internship"
-   *  location   → Location badge  e.g. "Nairobi" | "Remote" | "Nairobi / Remote"
-   *  desc       → One or two sentences describing the role
-   *  skills     → Array of required skills shown as tags  e.g. ["Python", "SQL", "Power BI"]
-   *  deadline   → (optional) Application deadline string  e.g. "31 August 2025"
-   *              Leave as "" or remove the line to hide the deadline
+   * HOW TO SET UP (one-time):
+   * 1. Create a new Google Sheet with the columns above
+   * 2. File → Share → Publish to web → Sheet1 → CSV → Publish
+   * 3. Copy the CSV link and paste it as SHEET_CSV_URL below
+   * 4. Create a Google Form for applications, paste its URL as APPLY_FORM_URL
+   *
    * ════════════════════════════════════════════════════════════ */
 
-  const VACANCIES = [
+  /* ── CONFIGURATION — only edit these two lines ── */
+  const SHEET_CSV_URL  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTkuhXKjy2FBo2a6OjFx9QpjwGR507D5kSL0H5qjCyN8_OFEfs4otLCZPSFZO221xGCSEz87u-b4wE/pub?output=csv';
+  const APPLY_FORM_URL = 'https://docs.google.com/document/d/1aDo8l6y6SdAPWNHGuYo2_2bxPCyD0oEEuhdyC3DeXqE/edit?usp=sharing';
+  /* ─────────────────────────────────────────────── */
 
-    /* ── PASTE NEW VACANCIES BELOW THIS LINE ──────────────────────
+  /* ── APPLY MODAL ── */
+  (function buildApplyModal() {
+    const overlay = document.createElement('div');
+    overlay.id = 'applyOverlay';
+    overlay.style.cssText = [
+      'position:fixed;inset:0;z-index:9900',
+      'background:rgba(15,13,10,.8);backdrop-filter:blur(10px)',
+      'display:none;align-items:center;justify-content:center;padding:20px'
+    ].join(';');
 
-    {
-      title:    "Data Analyst",
-      dept:     "Data Analytics",
-      type:     "Full-time",
-      location: "Nairobi",
-      desc:     "Join our core analytics team helping clients worldwide turn raw data into clear business insights. You'll own end-to-end analysis projects — from data cleaning to final presentation.",
-      skills:   ["Python", "SQL", "Power BI", "Excel", "Statistics"],
-      deadline: "30 September 2025"
-    },
+    overlay.innerHTML = `
+      <div id="applyModal" style="
+        background:var(--cream);border-radius:var(--rl);
+        width:100%;max-width:680px;max-height:92vh;
+        display:flex;flex-direction:column;overflow:hidden;
+        box-shadow:0 40px 100px rgba(15,13,10,.45);
+      ">
+        <div style="
+          display:flex;align-items:center;justify-content:space-between;
+          padding:18px 24px;background:var(--ink2);flex-shrink:0;
+          border-bottom:1px solid rgba(250,250,247,.08);
+        ">
+          <div>
+            <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold2);margin-bottom:3px;">Apply for</div>
+            <div id="applyModalTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--cream);"></div>
+          </div>
+          <button onclick="closeApplyModal()" style="
+            background:rgba(250,250,247,.08);border:none;color:rgba(250,250,247,.5);
+            width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:1.1rem;
+            display:flex;align-items:center;justify-content:center;transition:all .2s;
+          " onmouseover="this.style.background='rgba(250,250,247,.15)';this.style.color='var(--cream)'"
+             onmouseout="this.style.background='rgba(250,250,247,.08)';this.style.color='rgba(250,250,247,.5)'">✕</button>
+        </div>
+        <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;">
+          <iframe id="applyFrame" src="" frameborder="0"
+            style="flex:1;width:100%;min-height:500px;border:none;">
+          </iframe>
+          <!-- Branded redirect panel (shown for Google Docs) -->
+          <div id="applyRedirectPanel" style="
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            padding:48px 32px;text-align:center;flex:1;gap:20px;
+            background:var(--cream);
+          ">
+            <div style="font-size:3rem;margin-bottom:4px;">📋</div>
+            <div>
+              <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:8px;">Ready to Apply?</h3>
+              <p class="ap-role" style="font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;"></p>
+              <p style="color:var(--muted);font-size:.93rem;max-width:380px;line-height:1.7;">
+                Our application details will open in a new tab. Review the requirements and send your CV and cover letter directly to the DatAfrica team.
+              </p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:300px;">
+              <button id="applyOpenBtn" class="btn btn-gold" style="width:100%;justify-content:center;font-size:.88rem;">
+                Open Application <i class="fas fa-external-link-alt"></i>
+              </button>
+              <button onclick="closeApplyModal()" class="btn btn-outline" style="width:100%;justify-content:center;font-size:.82rem;">
+                Back to Vacancies
+              </button>
+            </div>
+            <p style="font-size:.72rem;color:var(--muted2);margin-top:4px;">
+              Questions? Email <a href="mailto:datafrica0@gmail.com" style="color:var(--gold);">datafrica0@gmail.com</a>
+            </p>
+          </div>
+        </div>
+        <div style="
+          padding:12px 24px;background:var(--cream2);border-top:1px solid var(--border);
+          font-size:.75rem;color:var(--muted);text-align:center;flex-shrink:0;
+        ">
+          Your application goes directly to the DatAfrica team · Powered by Google Forms
+        </div>
+      </div>`;
 
-    {
-      title:    "Frontend Developer",
-      dept:     "Engineering",
-      type:     "Contract",
-      location: "Remote",
-      desc:     "We're looking for a developer to help build and maintain client-facing dashboards and our internal management system products.",
-      skills:   ["HTML/CSS", "JavaScript", "React", "Responsive Design"],
-      deadline: ""
-    },
+    document.body.appendChild(overlay);
 
-    ── PASTE NEW VACANCIES ABOVE THIS LINE ────────────────────── */
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeApplyModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeApplyModal();
+    });
+  })();
 
-  ]; /* ← keep this closing bracket */
+  window.openApplyModal = function(jobTitle) {
+    document.getElementById('applyModalTitle').textContent = jobTitle;
 
+    /* Google Docs can't be iframed — show a branded screen then open in new tab */
+    const isDoc = APPLY_FORM_URL.includes('docs.google.com/document') ||
+                  APPLY_FORM_URL.includes('PASTE_YOUR');
 
-  /* ── RENDERER — no need to touch anything below this line ── */
-  (function renderVacancies() {
+    if (isDoc || !APPLY_FORM_URL || APPLY_FORM_URL.includes('PASTE_YOUR')) {
+      /* Show branded redirect panel inside iframe slot */
+      const frame = document.getElementById('applyFrame');
+      frame.style.display = 'none';
+      const panel = document.getElementById('applyRedirectPanel');
+      if (panel) {
+        panel.querySelector('.ap-role').textContent = jobTitle;
+        panel.style.display = 'flex';
+      }
+      document.getElementById('applyOpenBtn').onclick = function() {
+        window.open(APPLY_FORM_URL, '_blank', 'noopener');
+      };
+    } else {
+      document.getElementById('applyFrame').style.display = '';
+      const redirect = document.getElementById('applyRedirectPanel');
+      if (redirect) redirect.style.display = 'none';
+      const src = APPLY_FORM_URL.split('?')[0] + '?embedded=true';
+      document.getElementById('applyFrame').src = src;
+    }
+
+    document.getElementById('applyOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeApplyModal = function() {
+    document.getElementById('applyOverlay').style.display = 'none';
+    document.getElementById('applyFrame').src = '';
+    document.getElementById('applyFrame').style.display = '';
+    const rp = document.getElementById('applyRedirectPanel');
+    if (rp) rp.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  /* ── VACANCY RENDERER ── */
+  function renderVacancies(rows) {
     const emptyEl = document.getElementById('careersEmpty');
     const jobsEl  = document.getElementById('careersJobs');
+    const loadEl  = document.getElementById('careersLoading');
+    if (loadEl) loadEl.remove();
     if (!emptyEl || !jobsEl) return;
 
-    const live = VACANCIES.filter(v => v && v.title);
+    const live = rows.filter(r => r.status && r.status.trim().toLowerCase() === 'open' && r.title);
 
     if (live.length === 0) {
       emptyEl.style.display = '';
@@ -1498,51 +1597,119 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
     jobsEl.style.display  = 'flex';
     jobsEl.innerHTML = '';
 
-    live.forEach(function(v) {
-      const emailSubject = encodeURIComponent('Application — ' + v.title);
-      const skillTags = (v.skills || [])
-        .map(s => '<span class="job-skill">' + s + '</span>')
-        .join('');
-      const deadlineLine = v.deadline
-        ? '<span class="job-deadline"><i class="fas fa-clock"></i> Deadline: ' + v.deadline + '</span>'
+    live.forEach(function(v, i) {
+      const skills = (v.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+      const skillTags = skills.map(s => '<span class="j-skill">' + s + '</span>').join('');
+      const deadlineLine = v.deadline && v.deadline.trim()
+        ? '<span class="j-dl"><i class="fas fa-clock"></i> Deadline: ' + v.deadline.trim() + '</span>'
         : '';
+      const typeLower = (v.type || '').trim().toLowerCase();
+      const typeColor = typeLower === 'commission-based' || typeLower === 'commission'
+        ? 'background:rgba(74,120,86,.12);color:var(--sage);border-color:rgba(74,120,86,.28);'
+        : typeLower === 'internship'
+          ? 'background:rgba(99,102,241,.1);color:#6366f1;border-color:rgba(99,102,241,.25);'
+          : typeLower === 'contract'
+            ? 'background:rgba(234,179,8,.1);color:#b45309;border-color:rgba(234,179,8,.25);'
+            : '';
 
       const card = document.createElement('div');
       card.className = 'job-card reveal';
+      card.style.animationDelay = (i * 0.08) + 's';
       card.innerHTML =
-        '<div class="job-card-top">' +
+        '<div class="jc-top">' +
           '<div>' +
-            '<div class="job-dept">' + v.dept + '</div>' +
-            '<h3 class="job-title">' + v.title + '</h3>' +
+            '<div class="j-dept">' + (v.dept || '') + '</div>' +
+            '<h3 class="j-title">' + v.title + '</h3>' +
           '</div>' +
-          '<div class="job-meta-group">' +
-            '<span class="job-badge">' + v.type + '</span>' +
-            '<span class="job-badge outline">' + v.location + '</span>' +
+          '<div class="j-badges">' +
+            '<span class="j-badge" style="' + typeColor + '">' + (v.type || '') + '</span>' +
+            '<span class="j-badge out">' + (v.location || '') + '</span>' +
           '</div>' +
         '</div>' +
-        '<p class="job-desc">' + v.desc + '</p>' +
-        '<div class="job-skills">' + skillTags + '</div>' +
-        '<div class="job-footer">' +
-          '<div class="job-footer-left">' +
-            '<span class="job-location"><i class="fas fa-map-marker-alt"></i> ' + v.location + '</span>' +
+        '<p class="j-desc">' + (v.desc || '') + '</p>' +
+        '<div class="j-skills">' + skillTags + '</div>' +
+        '<div class="j-footer">' +
+          '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">' +
+            '<span class="j-loc"><i class="fas fa-map-marker-alt"></i> ' + (v.location || '') + '</span>' +
             deadlineLine +
           '</div>' +
-          '<a href="mailto:datafrica0@gmail.com?subject=' + emailSubject + '" class="btn btn-primary" style="padding:10px 24px; font-size:0.82rem;">' +
+          '<button onclick="openApplyModal(\'' + v.title.replace(/'/g, "\\'") + '\')" class="btn btn-primary" style="padding:10px 24px;font-size:.82rem;white-space:nowrap;">' +
             'Apply Now <i class="fas fa-arrow-right"></i>' +
-          '</a>' +
+          '</button>' +
         '</div>';
       jobsEl.appendChild(card);
-
-      /* trigger reveal animation */
-      setTimeout(() => card.classList.add('visible'), 50);
+      setTimeout(() => card.classList.add('visible'), 60 + i * 80);
     });
 
-    /* update nav badge */
     const badge = document.getElementById('careersBadge');
-    if (badge) {
-      badge.textContent = live.length;
-      badge.style.display = '';
+    if (badge) { badge.textContent = live.length; badge.style.display = ''; }
+  }
+
+  /* ── CSV PARSER ── */
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim().toLowerCase());
+    return lines.slice(1).map(line => {
+      /* handle quoted fields with commas inside */
+      const fields = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; }
+        else if (ch === ',' && !inQ) { fields.push(cur); cur = ''; }
+        else { cur += ch; }
+      }
+      fields.push(cur);
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = (fields[i] || '').replace(/^"|"$/g,'').trim());
+      return obj;
+    });
+  }
+
+  /* ── FETCH FROM GOOGLE SHEET ── */
+  (function loadVacancies() {
+    const emptyEl = document.getElementById('careersEmpty');
+    const jobsEl  = document.getElementById('careersJobs');
+
+    /* Show loading skeleton */
+    const loadEl = document.createElement('div');
+    loadEl.id = 'careersLoading';
+    loadEl.style.cssText = 'display:flex;flex-direction:column;gap:14px;margin-bottom:32px;';
+    loadEl.innerHTML = [1,2].map(() =>
+      '<div style="background:var(--cream);border:1px solid var(--border);border-radius:var(--rl);padding:28px 32px;">' +
+        '<div style="display:flex;gap:10px;margin-bottom:14px;">' +
+          '<div style="height:10px;width:120px;background:var(--cream3);border-radius:4px;animation:shimmer 1.4s infinite;"></div>' +
+        '</div>' +
+        '<div style="height:14px;width:220px;background:var(--cream3);border-radius:4px;margin-bottom:10px;animation:shimmer 1.4s infinite;"></div>' +
+        '<div style="height:9px;width:90%;background:var(--cream2);border-radius:4px;animation:shimmer 1.4s .2s infinite;"></div>' +
+      '</div>'
+    ).join('');
+    jobsEl.parentNode.insertBefore(loadEl, jobsEl);
+
+    /* Add shimmer keyframes once */
+    if (!document.getElementById('shimmerStyle')) {
+      const st = document.createElement('style');
+      st.id = 'shimmerStyle';
+      st.textContent = '@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.45}}';
+      document.head.appendChild(st);
     }
+
+    /* If URL not yet configured, fall back gracefully */
+    if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PASTE_YOUR')) {
+      loadEl.remove();
+      emptyEl.style.display = '';
+      return;
+    }
+
+    fetch(SHEET_CSV_URL)
+      .then(r => { if (!r.ok) throw new Error('fetch failed'); return r.text(); })
+      .then(csv => renderVacancies(parseCSV(csv)))
+      .catch(() => {
+        if (loadEl) loadEl.remove();
+        emptyEl.style.display = '';
+        jobsEl.style.display = 'none';
+      });
   })();
 
 
