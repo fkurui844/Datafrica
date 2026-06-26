@@ -543,7 +543,7 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
         <a href="#portfolio">Work</a>
         <a href="#pricing">Pricing</a>
         <a href="#custom-systems">Build My System</a>
-        <a href="#careers" id="careersNavLink" onclick="handleCareersClick(event)">Careers<span class="nav-badge" id="careersBadge" style="display:none;"></span></a>
+        <a href="https://docs.google.com/spreadsheets/d/1NuWYpYp-VBkdjO3kpEivm3U-fZF5dGHFLaVTGypDsLM/edit?usp=sharing" id="careersNavLink" target="_blank" rel="noopener" onclick="handleCareersClick(event)">Careers<span class="nav-badge" id="careersBadge" style="display:none;"></span></a>
         <a href="#contact" class="btn btn-gold" style="border-radius:4px;padding:9px 22px;">Get in Touch</a>
       </nav>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
@@ -562,7 +562,7 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
   <a href="#portfolio">Work</a>
   <a href="#pricing">Pricing</a>
   <a href="#custom-systems">Build My System</a>
-  <a href="#careers" id="careersNavLinkMob" onclick="handleCareersClick(event)">Careers</a>
+  <a href="https://docs.google.com/spreadsheets/d/1NuWYpYp-VBkdjO3kpEivm3U-fZF5dGHFLaVTGypDsLM/edit?usp=sharing" id="careersNavLinkMob" target="_blank" rel="noopener" onclick="handleCareersClick(event)">Careers</a>
   <a href="#contact">Get in Touch</a>
 </div>
 
@@ -1224,7 +1224,7 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
         <h4>Get in Touch</h4>
         <ul>
           <li><a href="#contact">Start a Project</a></li>
-          <li><a href="#careers" id="careersFooterLink" onclick="handleCareersClick(event)">Careers</a></li>
+          <li><a href="https://docs.google.com/spreadsheets/d/1NuWYpYp-VBkdjO3kpEivm3U-fZF5dGHFLaVTGypDsLM/edit?usp=sharing" id="careersFooterLink" target="_blank" rel="noopener" onclick="handleCareersClick(event)">Careers</a></li>
           <li><a href="https://wa.me/254734562997" target="_blank">WhatsApp</a></li>
           <li><a href="mailto:hello@datafrica.co.ke">hello@datafrica.co.ke</a></li>
         </ul>
@@ -1734,17 +1734,14 @@ footer{background:var(--ink2);border-top:1px solid rgba(250,250,247,.07);padding
     clearTimeout(_careersTimer);
     _careersTimer = setTimeout(() => { _careersClicks = 0; }, 4000);
 
-    if (_careersClicks < 6) {
-      if (_careersClicks >= 2) {
-        const rem = 6 - _careersClicks;
-        showClickHint(rem + ' more click' + (rem !== 1 ? 's' : '') + '…');
-      }
-      return; // normal nav
+    if (_careersClicks >= 6) {
+      e.preventDefault();
+      _careersClicks = 0;
+      clearTimeout(_careersTimer);
+      openAdmin();
+      return;
     }
-    e.preventDefault();
-    _careersClicks = 0;
-    clearTimeout(_careersTimer);
-    openAdmin();
+    // Normal clicks: let the link open the Google Sheet in a new tab
   }
 
   function showClickHint(msg) {
