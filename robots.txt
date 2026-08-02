@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kenya-school-of-data-analytics.vercel.app/sitemap.xml
